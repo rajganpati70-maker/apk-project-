@@ -1,0 +1,52 @@
+The GitHub repository I need to push to is:
+
+https://github.com/rajganpati70-maker/apk-project-
+
+Currently, Git/GitHub authentication is using the wrong GitHub account:
+
+ganpati0123
+
+The repository belongs to:
+
+rajganpati70-maker
+
+I am getting this error:
+
+remote: Permission to rajganpati70-maker/apk-project-.git denied to ganpati0123.
+fatal: unable to access ... 403
+
+I need you to fix ONLY the GitHub authentication/remote push issue.
+
+Requirements:
+
+1. Do NOT change or delete any existing application code.
+2. Do NOT change the React Native project.
+3. Do NOT change the GitHub Actions workflow that was already created.
+4. Keep the existing remote:
+   https://github.com/rajganpati70-maker/apk-project-.git
+5. Log out/remove the currently authenticated GitHub account `ganpati0123` from the Git credentials/GitHub CLI if necessary.
+6. Authenticate GitHub using the account `rajganpati70-maker`.
+7. Do NOT ask me to give you my GitHub password or personal access token in plain text.
+8. If browser authentication is required, open the GitHub authentication flow and let me complete the login securely.
+9. Verify that the authenticated GitHub account has write access to `rajganpati70-maker/apk-project-`.
+10. After authentication is fixed, run:
+    git remote -v
+    git status
+11. Push the existing `main` branch using:
+    git push -u origin main
+12. Verify that the push succeeds.
+13. After the push succeeds, verify that the GitHub Actions workflow `Build Android APK` appears in the repository and is triggered/available.
+14. Do NOT create another repository.
+15. Do NOT change the repository owner.
+16. Do NOT create a new branch unless absolutely required.
+
+If `rajganpati70-maker` is not actually authenticated on this computer, stop at the secure GitHub login step and tell me exactly what I need to do in the browser. Never request or expose my password/token.
+
+The only objective is:
+
+Current login: ganpati0123 ❌
+Required login: rajganpati70-maker ✅
+Repository: rajganpati70-maker/apk-project-
+Push branch: main
+
+Once successfully pushed, report the exact result and commit currently pushed to GitHub.
