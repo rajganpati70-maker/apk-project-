@@ -14,10 +14,10 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { NavigationProvider, useNavigation } from '../../src/context/NavigationContext';
-import { ScrollingSectionContainer, ContentBlockRenderer } from '../../src/components/content';
-import { ContentSection, ContentBlock, ContentBlockType, ListBlockData, ListItem } from '../../src/types';
-import { saveScrollPosition } from '../../src/utils/scrollStateManager';
+import { NavigationProvider, useNavigation } from '../../../src/context/NavigationContext';
+import { ScrollingSectionContainer, ContentBlockRenderer } from '../../../src/components/content';
+import { ContentSection, ContentBlock, ContentBlockType, ListBlockData, ListItem } from '../../../src/types';
+import { saveScrollPosition } from '../../../src/utils/scrollStateManager';
 
 /**
  * Tenant Applications Content Component

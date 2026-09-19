@@ -14,12 +14,12 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { NavigationProvider, useNavigation } from '../../src/context/NavigationContext';
-import { NavigationItem } from '../../src/components/navigation';
-import { ScrollingSectionContainer, ContentBlockRenderer } from '../../src/components/content';
-import { tenantManagementContent } from '../../src/data/demoContent';
-import { NavigationItem as NavigationItemType, ContentBlock } from '../../src/types';
-import { saveScrollPosition } from '../../src/utils/scrollStateManager';
+import { NavigationProvider, useNavigation } from '../../../src/context/NavigationContext';
+import { NavigationItem } from '../../../src/components/navigation';
+import { ScrollingSectionContainer, ContentBlockRenderer } from '../../../src/components/content';
+import { tenantManagementContent } from '../../../src/data/demoContent';
+import { NavigationItem as NavigationItemType, ContentBlock } from '../../../src/types';
+import { saveScrollPosition } from '../../../src/utils/scrollStateManager';
 
 /**
  * Tenant Management Content Component
