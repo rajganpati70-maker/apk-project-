@@ -33,7 +33,11 @@ export interface ContentBlock {
   type: ContentBlockType;
   title?: string;
   description?: string;
-  data: any;
+  data?: any;
+  /** Legacy flat metric fields kept for the original page definitions. */
+  value?: number | string;
+  trend?: number | string;
+  positive?: boolean;
   styles?: ContentBlockStyles;
   actions?: ContentBlockAction[];
   loading?: boolean;

@@ -7,4 +7,4 @@ export * from './navigation';
 export * from './content';
 
 // Re-export NavigationItemType as NavigationItem for backward compatibility
-export { NavigationItemType as NavigationItem } from './navigation';
+export type { NavigationItemType as NavigationItem } from './navigation';

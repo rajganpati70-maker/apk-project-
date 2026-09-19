@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { ContentBlock, ContentBlockType, MetricBlockData, ChartBlockData, ListBlockData, CardBlockData, TextBlockData, ImageBlockData } from '../../types';
 
 /**
@@ -220,19 +220,37 @@ export const ContentBlockRenderer: React.FC<ContentBlockRendererProps> = ({ bloc
       );
     }
 
+    const rawData = block.data;
+
     switch (block.type) {
       case ContentBlockType.METRIC:
-        return renderMetricBlock(block.data as MetricBlockData);
+        return renderMetricBlock((rawData || {
+          value: block.value ?? '—',
+          label: block.title || 'Metric',
+          change: typeof block.trend === 'number' ? block.trend : undefined,
+          changeType: block.positive === false ? 'decrease' : 'increase',
+        }) as MetricBlockData);
       case ContentBlockType.CHART:
-        return renderChartBlock(block.data as ChartBlockData);
+        return renderChartBlock((rawData?.chartType
+          ? {
+              type: rawData.chartType,
+              data: (rawData.labels || []).map((label: string, index: number) => ({
+                label,
+                value: rawData.values?.[index] ?? 0,
+              })),
+              colors: rawData.colors || (rawData.color ? [rawData.color] : undefined),
+            }
+          : rawData) as ChartBlockData);
       case ContentBlockType.LIST:
-        return renderListBlock(block.data as ListBlockData);
+        return renderListBlock((Array.isArray(rawData)
+          ? { items: rawData, showIcon: true }
+          : rawData) as ListBlockData);
       case ContentBlockType.CARD:
-        return renderCardBlock(block.data as CardBlockData);
+        return renderCardBlock(rawData as CardBlockData);
       case ContentBlockType.TEXT:
-        return renderTextBlock(block.data as TextBlockData);
+        return renderTextBlock(rawData as TextBlockData);
       case ContentBlockType.IMAGE:
-        return renderImageBlock(block.data as ImageBlockData);
+        return renderImageBlock(rawData as ImageBlockData);
       default:
         return (
           <View style={styles.unknownContainer}>
@@ -243,7 +261,12 @@ export const ContentBlockRenderer: React.FC<ContentBlockRendererProps> = ({ bloc
   };
 
   return (
-    <View style={[styles.container, block.styles?.container]} onPress={() => onPress?.(block)}>
+    <TouchableOpacity
+      style={[styles.container, block.styles?.container]}
+      onPress={() => onPress?.(block)}
+      disabled={!onPress}
+      activeOpacity={0.85}
+    >
       {block.title && block.type !== ContentBlockType.METRIC && block.type !== ContentBlockType.CHART && (
         <Text style={[styles.blockTitle, block.styles?.title]}>{block.title}</Text>
       )}
@@ -251,7 +274,7 @@ export const ContentBlockRenderer: React.FC<ContentBlockRendererProps> = ({ bloc
         <Text style={[styles.blockDescription, block.styles?.description]}>{block.description}</Text>
       )}
       {renderContent()}
-    </View>
+    </TouchableOpacity>
   );
 };
 

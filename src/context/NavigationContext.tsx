@@ -74,6 +74,17 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, []);
 
   /**
+   * Track navigation analytics event
+   */
+  const trackNavigationEvent = useCallback((event: NavigationAnalyticsEvent) => {
+    console.log('Navigation Event:', event);
+
+    const eventKey = `@anyrenting_nav_event_${Date.now()}`;
+    AsyncStorage.setItem(eventKey, JSON.stringify(event))
+      .catch(_error => console.error('Error storing navigation event'));
+  }, []);
+
+  /**
    * Navigate to a route
    */
   const navigate = useCallback((route: string, newParams?: Record<string, any>) => {
@@ -223,19 +234,6 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
    */
   const generateDeepLink = useCallback((route: string, linkParams?: Record<string, any>) => {
     return deepLinkingManager.generateDeepLink(route, linkParams);
-  }, []);
-
-  /**
-   * Track navigation analytics event
-   */
-  const trackNavigationEvent = useCallback((event: NavigationAnalyticsEvent) => {
-    // In production, this would send to analytics service
-    console.log('Navigation Event:', event);
-    
-    // Store events locally for batch sending
-    const eventKey = `@anyrenting_nav_event_${Date.now()}`;
-    AsyncStorage.setItem(eventKey, JSON.stringify(event))
-      .catch(_error => console.error('Error storing navigation event'));
   }, []);
 
   // Load state on mount

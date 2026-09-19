@@ -70,7 +70,7 @@ export interface NavigationItemProps {
 export interface NavigationSection {
   id: string;
   title: string;
-  items: NavigationItem[];
+  items: NavigationItemType[];
   collapsible?: boolean;
   defaultExpanded?: boolean;
 }
@@ -130,7 +130,7 @@ export interface NavigationContextType {
   params: Record<string, any>;
   navigate: (route: string, params?: Record<string, any>) => void;
   goBack: () => void;
-  canGoBack: boolean;
+  canGoBack: () => boolean;
   reset: (route?: string) => void;
 }
 
@@ -155,6 +155,7 @@ export interface NavigationStateManager {
 export interface NavigationState {
   currentRoute: string;
   navigationHistory: string[];
+  params?: Record<string, any>;
   scrollPositions: Record<string, number>;
   timestamp: number;
   version: string;

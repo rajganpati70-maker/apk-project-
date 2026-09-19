@@ -5,3 +5,31 @@ channel = "stable-25_05"
 
 [agent]
 expertMode = true
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Metro bundler"
+
+[[workflows.workflow]]
+name = "Metro bundler"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx react-native start --host 0.0.0.0 --port 8081"
+waitForPort = 8081
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[ports]]
+localPort = 8081
+externalPort = 80

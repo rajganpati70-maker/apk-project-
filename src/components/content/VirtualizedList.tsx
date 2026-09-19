@@ -10,9 +10,12 @@ import {
   StyleSheet,
   FlatList,
   ListRenderItemInfo,
-  ViewToken,
 } from 'react-native';
 import { performanceOptimizer } from '../../utils/performanceOptimizer';
+
+type ViewToken = {
+  isViewable?: boolean;
+};
 
 /**
  * VirtualizedList Props

@@ -342,7 +342,15 @@ const MainContent: React.FC = () => {
           {activeSubPage === '/properties/financials' && <PropertyFinancialsIndex />}
           {activeSubPage === '/properties/documents' && <PropertyDocumentsIndex />}
           {activeSubPage === '/properties/inspections' && <PropertyInspectionsIndex />}
-          {activeSubPage === '/properties/inventory' && <PropertyInventoryIndex />}
+          {activeSubPage === '/properties/inventory' && (
+            <PropertyInventoryIndex
+              navigateToRoute={(route) => {
+                setActivePage('properties-sub');
+                setActiveSubPage(route);
+                navigate(route);
+              }}
+            />
+          )}
         </View>
       );
     }

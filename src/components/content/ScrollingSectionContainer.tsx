@@ -126,7 +126,7 @@ export const ScrollingSectionContainer: React.FC<ScrollingSectionContainerProps>
   /**
    * Render item
    */
-  const renderItem = useCallback(({ item, index }: { item: ContentBlock; index: number }) => {
+  const renderItem = useCallback(({ item, index: _index }: { item: ContentBlock; index: number }) => {
     return (
       <Animated.View
         style={[
@@ -134,7 +134,6 @@ export const ScrollingSectionContainer: React.FC<ScrollingSectionContainerProps>
           {
             opacity: withTiming(1, {
               duration: 300,
-              delay: index * 50,
             }),
           },
         ]}

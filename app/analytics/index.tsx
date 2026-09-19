@@ -244,7 +244,7 @@ const analyticsSections: ContentSection[] = [
 /**
  * Analytics Page Component
  */
-const AnalyticsPage: React.FC = ({ navigateToRoute }: { navigateToRoute: (route: string) => void }) => {
+const AnalyticsPage: React.FC<{ navigateToRoute: (route: string) => void }> = ({ navigateToRoute }) => {
   const [_refreshing, setRefreshing] = useState(false);
 
   /**

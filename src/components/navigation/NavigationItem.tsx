@@ -26,10 +26,10 @@ const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpaci
 
 // Haptic feedback helpers (conditional support)
 const Haptics = {
-  impactAsync: async () => {
+  impactAsync: async (_style?: string) => {
     // No-op when haptics not available
   },
-  notificationAsync: async () => {
+  notificationAsync: async (_type?: string) => {
     // No-op when haptics not available
   },
   ImpactFeedbackStyle: {
