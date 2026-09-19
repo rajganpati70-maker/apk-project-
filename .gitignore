@@ -98,3 +98,6 @@ dist/
 release.keystore
 *.p12
 *.p8
+
+# EAS (not needed for React Native CLI)
+eas.json
