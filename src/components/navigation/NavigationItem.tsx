@@ -20,10 +20,7 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import {
-  NavigationItemProps,
-  NavigationItemType as _NavItemType,
-} from '../../types';
+import { NavigationItemProps } from '../../types';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 

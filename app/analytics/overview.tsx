@@ -13,9 +13,8 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native';
-import { NavigationItem } from '../../src/components/navigation';
 import { ScrollingSectionContainer, ContentBlockRenderer } from '../../src/components/content';
-import { NavigationItem as NavigationItemType, ContentBlock, ContentSection } from '../../src/types';
+import { ContentBlock, ContentSection } from '../../src/types';
 
 /**
  * Analytics Overview Content - 6 Unique Scrollable Sections

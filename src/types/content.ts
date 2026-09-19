@@ -9,18 +9,20 @@ import { TextStyle, ViewStyle, ImageStyle } from 'react-native';
  * Content block type enumeration
  * Defines all available content block types in the system
  */
-export enum ContentBlockType {
-  METRIC = 'metric',
-  CHART = 'chart',
-  LIST = 'list',
-  CARD = 'card',
-  TEXT = 'text',
-  IMAGE = 'image',
-  TABLE = 'table',
-  PROGRESS = 'progress',
-  ALERT = 'alert',
-  DIVIDER = 'divider',
-}
+export const ContentBlockType = {
+  METRIC: 'metric',
+  CHART: 'chart',
+  LIST: 'list',
+  CARD: 'card',
+  TEXT: 'text',
+  IMAGE: 'image',
+  TABLE: 'table',
+  PROGRESS: 'progress',
+  ALERT: 'alert',
+  DIVIDER: 'divider',
+} as const;
+
+export type ContentBlockType = (typeof ContentBlockType)[keyof typeof ContentBlockType];
 
 /**
  * Content block interface

@@ -25,11 +25,6 @@ export const mainDashboardContent: DemoContent = {
   sections: [
     {
       id: 'key-metrics',
-      title: '📊 Key Performance Metrics',
-      description: 'Overview of your rental business performance',
-      blocks: [
-    {
-      id: 'key-metrics',
       title: 'Key Performance Metrics',
       blocks: [
         {
@@ -820,8 +815,6 @@ export const financialManagementContent: DemoContent = {
             showGrid: true,
           } as ChartBlockData,
         },
-      ],
-    },
       ],
     },
   ],
