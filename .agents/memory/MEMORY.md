@@ -1,0 +1,1 @@
+- [Metro welcome banner](metro-welcome-banner.md) — the workflow banner is not the rendered React Native screen; verify the registered bundle instead.
