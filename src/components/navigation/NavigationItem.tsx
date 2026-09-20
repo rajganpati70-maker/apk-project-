@@ -1,390 +1,243 @@
 /**
- * NavigationItem Component
- * Advanced navigation item with press states, animations, and haptic feedback
- * Provides comprehensive accessibility support and visual feedback
+ * Navigation Item Component
+ * Interactive navigation cards with press states and premium animations
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
+  Animated,
   AccessibilityInfo,
+  Platform,
 } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withSequence,
-  withTiming,
-  Easing,
-} from 'react-native-reanimated';
-import { NavigationItemProps } from '../../types';
+import { NavigationItem as NavigationItemType } from '../../types/navigation';
 
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
+interface NavigationItemProps {
+  item: NavigationItemType;
+  onPress: (item: NavigationItemType) => void;
+  hapticFeedback?: boolean;
+  testID?: string;
+}
 
-// Haptic feedback helpers (conditional support)
-const Haptics = {
-  impactAsync: async (_style?: string) => {
-    // No-op when haptics not available
-  },
-  notificationAsync: async (_type?: string) => {
-    // No-op when haptics not available
-  },
-  ImpactFeedbackStyle: {
-    Light: 'light',
-    Heavy: 'heavy',
-  },
-  NotificationFeedbackType: {
-    Success: 'success',
-  },
-};
-
-/**
- * NavigationItem Component
- * 
- * @param {NavigationItemProps} props - Component props
- * @returns {JSX.Element} Rendered navigation item
- */
-export const NavigationItem: React.FC<NavigationItemProps> = ({
+const NavigationItem: React.FC<NavigationItemProps> = ({
   item,
   onPress,
-  onLongPress,
-  style,
-  showBadge = true,
-  hapticFeedback = true,
+  hapticFeedback = false,
   testID,
-}: NavigationItemProps) => {
+}) => {
+  const [scaleAnim] = useState(new Animated.Value(1));
+  const [opacityAnim] = useState(new Animated.Value(1));
+  const [translateXAnim] = useState(new Animated.Value(20));
   const [isPressed, setIsPressed] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
 
-  // Animation values
-  const scale = useSharedValue(1);
-  const opacity = useSharedValue(1);
-  const translateX = useSharedValue(0);
+  // Entrance animation
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(translateXAnim, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacityAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
 
-  /**
-   * Handle press in event
-   */
   const handlePressIn = () => {
     setIsPressed(true);
     
-    // Scale down animation
-    scale.value = withSpring(0.96, {
-      damping: 15,
-      stiffness: 400,
-    });
+    // Animate press effect with spring
+    Animated.parallel([
+      Animated.spring(scaleAnim, {
+        toValue: 0.95,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+      Animated.spring(opacityAnim, {
+        toValue: 0.85,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
 
-    // Haptic feedback
-    if (hapticFeedback && !item.disabled) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    // Haptic feedback (simulated for now, would use expo-haptics)
+    if (hapticFeedback && Platform.OS === 'ios') {
+      // In production: Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      console.log('Haptic feedback triggered');
     }
   };
 
-  /**
-   * Handle press out event
-   */
   const handlePressOut = () => {
     setIsPressed(false);
     
-    // Scale back animation
-    scale.value = withSpring(1, {
-      damping: 15,
-      stiffness: 400,
-    });
+    // Animate release effect with spring
+    Animated.parallel([
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+      Animated.spring(opacityAnim, {
+        toValue: 1,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
   };
 
-  /**
-   * Handle press event
-   */
   const handlePress = () => {
-    if (item.disabled) return;
-
-    // Success haptic feedback
-    if (hapticFeedback) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    }
-
-    // Scale animation sequence
-    scale.value = withSequence(
-      withTiming(1.1, { duration: 100, easing: Easing.out(Easing.ease) }),
-      withTiming(1, { duration: 200, easing: Easing.inOut(Easing.ease) })
-    );
-
-    // Opacity flash
-    opacity.value = withSequence(
-      withTiming(0.7, { duration: 100 }),
-      withTiming(1, { duration: 200 })
-    );
-
-    // Call press handler
-    if (onPress) {
-      onPress(item);
-    }
-
-    // Announce to screen readers
-    if (item.accessibilityLabel) {
-      AccessibilityInfo.announceForAccessibility(item.accessibilityLabel);
-    }
-  };
-
-  /**
-   * Handle long press event
-   */
-  const handleLongPress = () => {
-    if (item.disabled) return;
-
-    // Heavy haptic feedback
-    if (hapticFeedback) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    }
-
-    // Translate animation
-    translateX.value = withSequence(
-      withTiming(10, { duration: 100 }),
-      withTiming(0, { duration: 200 })
-    );
-
-    // Call long press handler
-    if (onLongPress) {
-      onLongPress(item);
-    }
-  };
-
-  /**
-   * Handle focus event
-   */
-  const handleFocus = () => {
-    setIsFocused(true);
+    // Announce for screen readers
+    AccessibilityInfo.announceForAccessibility(`Navigating to ${item.title}`);
     
-    // Subtle scale animation
-    scale.value = withSpring(1.02, {
-      damping: 20,
-      stiffness: 300,
-    });
-  };
-
-  /**
-   * Handle blur event
-   */
-  const handleBlur = () => {
-    setIsFocused(false);
-    
-    // Reset scale
-    scale.value = withSpring(1, {
-      damping: 20,
-      stiffness: 300,
-    });
-  };
-
-  // Animated styles
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: scale.value },
-      { translateX: translateX.value },
-    ],
-    opacity: opacity.value,
-  }));
-
-  // Determine container style based on state
-  const getContainerStyle = (): any => {
-    const baseStyle = [styles.container, style?.container];
-    
-    if (item.disabled) {
-      return [...baseStyle, styles.disabledContainer, style?.disabledContainer];
-    }
-    
-    if (isPressed) {
-      return [...baseStyle, styles.pressedContainer, style?.pressedContainer];
-    }
-    
-    if (isFocused) {
-      return [...baseStyle, styles.focusedContainer, style?.focusedContainer];
-    }
-    
-    return baseStyle;
-  };
-
-  // Determine title style
-  const getTitleStyle = (): any => {
-    const baseStyle = [styles.title, style?.title];
-    
-    if (item.disabled) {
-      return [...baseStyle, styles.disabledTitle];
-    }
-    
-    return baseStyle;
-  };
-
-  // Determine description style
-  const getDescriptionStyle = (): any => {
-    const baseStyle = [styles.description, style?.description];
-    
-    if (item.disabled) {
-      return [...baseStyle, styles.disabledDescription];
-    }
-    
-    return baseStyle;
+    // Trigger onPress callback
+    onPress(item);
   };
 
   return (
-    <AnimatedTouchableOpacity
-      testID={testID || `navigation-item-${item.id}`}
-      style={getContainerStyle()}
-      onPress={handlePress}
-      onLongPress={handleLongPress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-      activeOpacity={1}
-      disabled={item.disabled}
-      accessible={true}
-      accessibilityLabel={item.accessibilityLabel || item.title}
-      accessibilityHint={item.accessibilityHint || `Navigate to ${item.title}`}
-      accessibilityRole="button"
-      accessibilityState={{
-        disabled: item.disabled,
-        selected: isFocused,
-      }}
+    <Animated.View
+      style={[
+        styles.container,
+        {
+          transform: [{ scale: scaleAnim }, { translateX: translateXAnim }],
+          opacity: opacityAnim,
+        },
+        isPressed && styles.pressed,
+      ]}
+      testID={testID}
     >
-      <Animated.View style={[styles.contentContainer, animatedStyle]}>
-        {/* Icon */}
-        {item.icon && (
-          <View style={[styles.iconContainer, style?.icon]}>
-            <Text style={styles.icon}>{item.icon}</Text>
-          </View>
-        )}
-
-        {/* Text content */}
-        <View style={styles.textContainer}>
-          <Text style={getTitleStyle()} numberOfLines={1}>
-            {item.title}
-          </Text>
-          
-          {item.description && (
-            <Text style={getDescriptionStyle()} numberOfLines={2}>
-              {item.description}
-            </Text>
+      <TouchableOpacity
+        style={styles.touchable}
+        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        accessible={true}
+        accessibilityLabel={item.accessibilityLabel}
+        accessibilityHint={item.accessibilityHint}
+        accessibilityRole="button"
+        accessibilityState={{ selected: false }}
+        activeOpacity={0.9}
+      >
+        <View style={styles.iconContainer}>
+          <Text style={styles.icon}>{item.icon}</Text>
+          {item.badge && item.badge > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{item.badge}</Text>
+            </View>
           )}
         </View>
-
-        {/* Badge */}
-        {showBadge && item.badge && (
-          <View style={[styles.badgeContainer, style?.badge]}>
-            <Text style={[styles.badgeText, style?.badgeText]}>
-              {typeof item.badge === 'number' && item.badge > 99 ? '99+' : item.badge}
-            </Text>
-          </View>
-        )}
-
-        {/* Chevron indicator */}
-        {!item.disabled && (
-          <View style={styles.chevronContainer}>
-            <Text style={styles.chevron}>›</Text>
-          </View>
-        )}
-      </Animated.View>
-    </AnimatedTouchableOpacity>
+        
+        <View style={styles.content}>
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.description}>{item.description}</Text>
+        </View>
+        
+        <View style={styles.arrow}>
+          <Text style={styles.arrowText}>›</Text>
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
-/**
- * Default styles for NavigationItem
- */
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginVertical: 8,
     marginHorizontal: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginVertical: 8,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  pressedContainer: {
-    backgroundColor: '#F3F4F6',
-    transform: [{ scale: 0.98 }],
+  pressed: {
+    shadowColor: '#667eea',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+    borderColor: '#667eea',
   },
-  focusedContainer: {
-    backgroundColor: '#F9FAFB',
-    borderWidth: 2,
-    borderColor: '#3B82F6',
-  },
-  disabledContainer: {
-    backgroundColor: '#F9FAFB',
-    opacity: 0.6,
-  },
-  contentContainer: {
+  touchable: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 16,
   },
   iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#EFF6FF',
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 14,
+    position: 'relative',
+    shadowColor: '#667eea',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
   icon: {
-    fontSize: 20,
-    color: '#3B82F6',
+    fontSize: 26,
   },
-  textContainer: {
-    flex: 1,
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#EF4444',
+    borderRadius: 12,
+    minWidth: 22,
+    height: 22,
     justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 7,
+    shadowColor: '#EF4444',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  content: {
+    flex: 1,
   },
   title: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '700',
     color: '#111827',
     marginBottom: 4,
+    letterSpacing: -0.3,
   },
   description: {
     fontSize: 14,
     color: '#6B7280',
     lineHeight: 20,
   },
-  disabledTitle: {
+  arrow: {
+    marginLeft: 10,
+  },
+  arrowText: {
+    fontSize: 28,
     color: '#9CA3AF',
-  },
-  disabledDescription: {
-    color: '#D1D5DB',
-  },
-  badgeContainer: {
-    backgroundColor: '#EF4444',
-    borderRadius: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    minWidth: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  badgeText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  chevronContainer: {
-    marginLeft: 8,
-  },
-  chevron: {
-    fontSize: 24,
-    color: '#9CA3AF',
-    fontWeight: '300',
+    fontWeight: '200',
   },
 });
 

@@ -1,212 +1,142 @@
 /**
- * Navigation types and interfaces for the AnyRenting app
- * Provides type-safe navigation with comprehensive support for all navigation levels
+ * Navigation Type Definitions
+ * TypeScript interfaces for navigation components and data structures
  */
 
-import { TextStyle, ViewStyle } from 'react-native';
-
-/**
- * Base navigation item interface
- * Defines the core structure for all navigation items across the app
- */
-export interface NavigationItemType {
+export interface NavigationItem {
   id: string;
   title: string;
-  description?: string;
-  icon?: string;
+  description: string;
+  icon: string;
   route: string;
-  params?: Record<string, any>;
-  badge?: number | string;
-  disabled?: boolean;
-  accessibilityLabel?: string;
-  accessibilityHint?: string;
+  badge?: number;
+  accessibilityLabel: string;
+  accessibilityHint: string;
+  metadata?: Record<string, any>;
 }
 
-/**
- * Navigation item press state
- * Tracks the visual and functional state of navigation items
- */
-export interface NavigationItemState {
-  isPressed: boolean;
-  isFocused: boolean;
-  isDisabled: boolean;
-  isLoading: boolean;
-}
-
-/**
- * Navigation item styles
- * Comprehensive styling configuration for navigation items
- */
-export interface NavigationItemStyles {
-  container?: ViewStyle;
-  pressedContainer?: ViewStyle;
-  focusedContainer?: ViewStyle;
-  disabledContainer?: ViewStyle;
-  title?: TextStyle;
-  description?: TextStyle;
-  icon?: ViewStyle;
-  badge?: ViewStyle;
-  badgeText?: TextStyle;
-}
-
-/**
- * Navigation item props
- * Complete props interface for the NavigationItem component
- */
-export interface NavigationItemProps {
-  item: NavigationItemType;
-  onPress?: (item: NavigationItemType) => void;
-  onLongPress?: (item: NavigationItemType) => void;
-  style?: NavigationItemStyles;
-  showBadge?: boolean;
-  hapticFeedback?: boolean;
-  testID?: string;
-}
-
-/**
- * Navigation section interface
- * Groups related navigation items into logical sections
- */
-export interface NavigationSection {
-  id: string;
-  title: string;
-  items: NavigationItemType[];
-  collapsible?: boolean;
-  defaultExpanded?: boolean;
-}
-
-/**
- * Navigation route configuration
- * Defines the structure for navigation routes with parameters
- */
-export interface NavigationRoute {
-  path: string;
-  component: React.ComponentType<any>;
-  title: string;
-  params?: Record<string, any>;
-  options?: {
-    headerShown?: boolean;
-    headerTitle?: string;
-    headerStyle?: any;
-    headerTintColor?: string;
-    tabBarVisible?: boolean;
-    tabBarLabel?: string;
-    tabBarIcon?: any;
-  };
-}
-
-/**
- * Navigation stack configuration
- * Defines the structure for stack navigation hierarchies
- */
-export interface NavigationStack {
-  id: string;
-  initialRoute: string;
-  routes: NavigationRoute[];
-  mode?: 'card' | 'modal' | 'stack';
-  headerMode?: 'float' | 'screen' | 'none';
-}
-
-/**
- * Navigation tab configuration
- * Defines the structure for bottom tab navigation
- */
-export interface NavigationTab {
-  id: string;
-  title: string;
-  icon: any;
-  route: string;
-  badge?: number | string;
-  notification?: boolean;
-}
-
-/**
- * Navigation context interface
- * Provides global navigation state and methods
- */
-export interface NavigationContextType {
-  currentRoute: string;
-  navigationHistory: string[];
-  params: Record<string, any>;
-  navigate: (route: string, params?: Record<string, any>) => void;
-  goBack: () => void;
-  canGoBack: () => boolean;
-  reset: (route?: string) => void;
-}
-
-/**
- * Navigation state manager interface
- * Manages navigation state persistence and restoration
- */
-export interface NavigationStateManager {
-  saveState: (state: NavigationState) => Promise<void>;
-  restoreState: () => Promise<NavigationState | null>;
-  clearState: () => Promise<void>;
-  getCurrentRoute: () => string;
-  getNavigationHistory: () => string[];
-  addToHistory: (route: string) => void;
-  removeFromHistory: (route: string) => void;
-}
-
-/**
- * Navigation state interface
- * Complete navigation state structure for persistence
- */
 export interface NavigationState {
   currentRoute: string;
   navigationHistory: string[];
-  params?: Record<string, any>;
   scrollPositions: Record<string, number>;
-  timestamp: number;
-  version: string;
+  breadcrumbs: BreadcrumbItem[];
 }
 
-/**
- * Breadcrumb navigation item
- * Represents a single breadcrumb in the navigation trail
- */
 export interface BreadcrumbItem {
+  label: string;
+  route: string;
+  id: string;
+}
+
+export interface NavigationContextType {
+  navigate: (route: string, params?: any) => void;
+  goBack: () => void;
+  currentRoute: string;
+  navigationHistory: string[];
+  addBreadcrumb: (item: BreadcrumbItem) => void;
+  breadcrumbs: BreadcrumbItem[];
+  clearHistory: () => void;
+}
+
+export interface ContentBlock {
+  id: string;
+  type: ContentBlockType;
+  title: string;
+  description?: string;
+  data: any;
+  metadata?: Record<string, any>;
+}
+
+export enum ContentBlockType {
+  METRIC = 'metric',
+  CHART = 'chart',
+  LIST = 'list',
+  CARD = 'card',
+  TEXT = 'text',
+  IMAGE = 'image',
+}
+
+export interface ContentSection {
   id: string;
   title: string;
-  route: string;
-  params?: Record<string, any>;
-  clickable?: boolean;
+  description?: string;
+  blocks: ContentBlock[];
+  metadata?: Record<string, any>;
 }
 
-/**
- * Deep link configuration
- * Defines deep linking support for navigation
- */
-export interface DeepLinkConfig {
-  scheme: string;
-  paths: Record<string, {
-    route: string;
-    params?: Record<string, any>;
-  }>;
-  fallbackRoute?: string;
+export interface DemoContent {
+  id: string;
+  title: string;
+  description: string;
+  sections: ContentSection[];
+  metadata?: {
+    category: string;
+    tags: string[];
+    featured?: boolean;
+    priority?: number;
+  };
+  version: string;
+  lastUpdated: string;
 }
 
-/**
- * Navigation analytics event
- * Tracks navigation events for analytics
- */
-export interface NavigationAnalyticsEvent {
-  eventType: 'navigate' | 'back' | 'tab_change' | 'deep_link';
-  route: string;
-  params?: Record<string, any>;
-  timestamp: number;
-  duration?: number;
-  source?: 'user' | 'system' | 'deep_link';
+export interface MetricBlockData {
+  value: number;
+  label: string;
+  change?: number;
+  changeType?: 'increase' | 'decrease';
+  prefix?: string;
+  suffix?: string;
+  unit?: string;
+  format: 'number' | 'currency' | 'percentage';
+  trend?: number[];
 }
 
-/**
- * Navigation performance metrics
- * Tracks navigation performance for optimization
- */
-export interface NavigationPerformanceMetrics {
-  route: string;
-  renderTime: number;
-  transitionTime: number;
-  memoryUsage: number;
-  timestamp: number;
+export interface ChartBlockData {
+  type: 'line' | 'bar' | 'pie' | 'donut';
+  data: ChartDataPoint[];
+  colors?: string[];
+  showLegend?: boolean;
+  showGrid?: boolean;
+  interactive?: boolean;
+}
+
+export interface ChartDataPoint {
+  label: string;
+  value: number;
+  metadata?: Record<string, any>;
+}
+
+export interface ListBlockData {
+  items: ListItem[];
+  showAvatar?: boolean;
+  showIcon?: boolean;
+  searchable?: boolean;
+  sortOptions?: SortOption[];
+}
+
+export interface ListItem {
+  id: string;
+  title: string;
+  description: string;
+  icon?: string;
+  badge?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface SortOption {
+  id: string;
+  label: string;
+  field: string;
+  direction: 'asc' | 'desc';
+}
+
+export interface CardBlockData {
+  size: 'small' | 'medium' | 'large';
+  layout: 'horizontal' | 'vertical' | 'grid';
+}
+
+export interface ScrollState {
+  position: number;
+  isScrolling: boolean;
+  direction: 'up' | 'down' | null;
 }

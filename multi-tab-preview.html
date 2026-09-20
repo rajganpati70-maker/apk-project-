@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnyRenting App - Multi-Tab Navigation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .app-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            flex-shrink: 0;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .metric-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+        
+        .metric-change {
+            font-size: 10px;
+            color: #10b981;
+            font-weight: 600;
+        }
+        
+        .nav-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-right: 15px;
+        }
+        
+        .nav-content {
+            flex: 1;
+        }
+        
+        .nav-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 3px;
+        }
+        
+        .nav-description {
+            font-size: 12px;
+            color: #64748b;
+        }
+        
+        .nav-badge {
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 10px;
+            margin-left: 10px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 15px;
+        }
+        
+        .bottom-tabs {
+            display: flex;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 10px 5px;
+            flex-shrink: 0;
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #9ca3af;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .tab:hover {
+            background: #f8fafc;
+        }
+        
+        .content-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .content-section h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        
+        .content-section p {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+        
+        .sub-nav-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .sub-nav-item:hover {
+            background: #f0f4ff;
+        }
+        
+        .sub-nav-icon {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        
+        .sub-nav-text {
+            flex: 1;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1 id="page-title">Dashboard</h1>
+            <p id="page-subtitle">Property Management Overview</p>
+        </div>
+        
+        <div class="content" id="dashboard-content">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">156</div>
+                    <div class="metric-label">Total Properties</div>
+                    <div class="metric-change">+12 ▲</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">94.2%</div>
+                    <div class="metric-label">Occupancy Rate</div>
+                    <div class="metric-change">+2.8% ▲</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">$284.5K</div>
+                    <div class="metric-label">Monthly Revenue</div>
+                    <div class="metric-change">+8.5% ▲</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">142</div>
+                    <div class="metric-label">Active Tenants</div>
+                    <div class="metric-change">+5 ▲</div>
+                </div>
+            </div>
+            
+            <div class="section-title">Navigation</div>
+            
+            <div class="nav-item">
+                <div class="nav-icon">🏢</div>
+                <div class="nav-content">
+                    <div class="nav-title">Property Management</div>
+                    <div class="nav-description">Manage your 156 rental properties</div>
+                </div>
+                <div class="nav-badge">23</div>
+            </div>
+            
+            <div class="nav-item">
+                <div class="nav-icon">💰</div>
+                <div class="nav-content">
+                    <div class="nav-title">Financial Management</div>
+                    <div class="nav-description">Track revenue, expenses, and profits</div>
+                </div>
+                <div class="nav-badge">5</div>
+            </div>
+            
+            <div class="nav-item">
+                <div class="nav-icon">👥</div>
+                <div class="nav-content">
+                    <div class="nav-title">Tenant Management</div>
+                    <div class="nav-description">Manage 142 active tenants</div>
+                </div>
+                <div class="nav-badge">8</div>
+            </div>
+            
+            <div class="nav-item">
+                <div class="nav-icon">📊</div>
+                <div class="nav-content">
+                    <div class="nav-title">Analytics & Reports</div>
+                    <div class="nav-description">Deep insights and performance metrics</div>
+                </div>
+            </div>
+            
+            <div class="nav-item">
+                <div class="nav-icon">🔧</div>
+                <div class="nav-content">
+                    <div class="nav-title">Maintenance</div>
+                    <div class="nav-description">23 open maintenance requests</div>
+                </div>
+                <div class="nav-badge">23</div>
+            </div>
+            
+            <div class="nav-item">
+                <div class="nav-icon">⚙️</div>
+                <div class="nav-content">
+                    <div class="nav-title">Settings</div>
+                    <div class="nav-description">App configuration and preferences</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content hidden" id="analytics-content">
+            <div class="section-title">Analytics Tools</div>
+            
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">📊</div>
+                <div class="sub-nav-text">Analytics Overview</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">⚡</div>
+                <div class="sub-nav-text">Real-Time Analytics</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">💰</div>
+                <div class="sub-nav-text">Financial Reports</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">👥</div>
+                <div class="sub-nav-text">Tenant Analytics</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">📈</div>
+                <div class="sub-nav-text">Market Intelligence</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">🔮</div>
+                <div class="sub-nav-text">Predictive Insights</div>
+            </div>
+            
+            <div class="content-section">
+                <h3>📊 Analytics Overview</h3>
+                <p>High-level performance metrics and KPIs</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">87%</div>
+                        <div class="metric-label">Occupancy Rate</div>
+                        <div class="metric-change">+5% ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">$1,850</div>
+                        <div class="metric-label">Avg Rent</div>
+                        <div class="metric-change">+$120 ▲</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>🏢 Property Performance</h3>
+                <p>Individual property analytics and rankings</p>
+                <div class="sub-nav-item">
+                    <div class="sub-nav-icon">🏆</div>
+                    <div class="sub-nav-text">Top 5 Performing Properties</div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>💰 Financial Reports</h3>
+                <p>Detailed financial analysis and projections</p>
+                <div class="sub-nav-item">
+                    <div class="sub-nav-icon">📈</div>
+                    <div class="sub-nav-text">Revenue Breakdown by Category</div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>👥 Tenant Analytics</h3>
+                <p>Tenant behavior, satisfaction, and retention</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">87.3%</div>
+                        <div class="metric-label">Retention Rate</div>
+                        <div class="metric-change">+4.1% ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">4.2/5.0</div>
+                        <div class="metric-label">Satisfaction</div>
+                        <div class="metric-change">+0.3 ▲</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>📈 Market Intelligence</h3>
+                <p>Real estate market trends and comparisons</p>
+                <div class="sub-nav-item">
+                    <div class="sub-nav-icon">📊</div>
+                    <div class="sub-nav-text">Market Rate Comparison</div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>🔮 Predictive Insights</h3>
+                <p>AI-powered predictions and recommendations</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">$295K</div>
+                        <div class="metric-label">Next Month Forecast</div>
+                        <div class="metric-change">+5% ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">$45.2K</div>
+                        <div class="metric-label">Maintenance Costs</div>
+                        <div class="metric-change">+$2.3K ▲</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content hidden" id="maintenance-content">
+            <div class="section-title">Maintenance Tools</div>
+            
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">🔧</div>
+                <div class="sub-nav-text">Maintenance Overview</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">⚡</div>
+                <div class="sub-nav-text">Active Maintenance</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">📅</div>
+                <div class="sub-nav-text">Maintenance Calendar</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">👷</div>
+                <div class="sub-nav-text">Vendor Management</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">💰</div>
+                <div class="sub-nav-text">Maintenance Budget</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">📋</div>
+                <div class="sub-nav-text">Maintenance History</div>
+            </div>
+            
+            <div class="content-section">
+                <h3>🔧 Maintenance Overview</h3>
+                <p>Current maintenance status and quick actions</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">23</div>
+                        <div class="metric-label">Open Requests</div>
+                        <div class="metric-change">+3 ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">5</div>
+                        <div class="metric-label">Urgent</div>
+                        <div class="metric-change">-2 ▼</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>⚡ Active Maintenance</h3>
+                <p>Currently in-progress maintenance tasks</p>
+                <div class="sub-nav-item">
+                    <div class="sub-nav-icon">🔨</div>
+                    <div class="sub-nav-text">In-Progress Tasks</div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>📅 Maintenance Calendar</h3>
+                <p>Scheduled maintenance and upcoming tasks</p>
+                <div class="sub-nav-item">
+                    <div class="sub-nav-icon">📆</div>
+                    <div class="sub-nav-text">This Week's Schedule</div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>👷 Vendor Management</h3>
+                <p>External contractors and service providers</p>
+                <div class="sub-nav-item">
+                    <div class="sub-nav-icon">👥</div>
+                    <div class="sub-nav-text">Active Vendors</div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>💰 Maintenance Budget</h3>
+                <p>Budget tracking and cost analysis</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">$8,450</div>
+                        <div class="metric-label">Spent</div>
+                        <div class="metric-change">+$1.2K ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">$11,550</div>
+                        <div class="metric-label">Remaining</div>
+                        <div class="metric-change">-$1.2K ▼</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>📋 Maintenance History</h3>
+                <p>Past maintenance records and analytics</p>
+                <div class="sub-nav-item">
+                    <div class="sub-nav-icon">✅</div>
+                    <div class="sub-nav-text">Recently Completed</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content hidden" id="settings-content">
+            <div class="section-title">Settings Categories</div>
+            
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">⚙️</div>
+                <div class="sub-nav-text">Settings Overview</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">💳</div>
+                <div class="sub-nav-text">Billing Management</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">🔗</div>
+                <div class="sub-nav-text">Integrations</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">👥</div>
+                <div class="sub-nav-text">Team Management</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">🔧</div>
+                <div class="sub-nav-text">Advanced Settings</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">🔒</div>
+                <div class="sub-nav-text">Security Settings</div>
+            </div>
+            
+            <div class="content-section">
+                <h3>⚙️ Settings Overview</h3>
+                <p>General app settings and preferences</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">2.4.1</div>
+                        <div class="metric-label">App Version</div>
+                        <div class="metric-change">Latest</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">Active</div>
+                        <div class="metric-label">Account Status</div>
+                        <div class="metric-change">Premium</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>💳 Billing Management</h3>
+                <p>Subscription and payment settings</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">Premium</div>
+                        <div class="metric-label">Current Plan</div>
+                        <div class="metric-change">$49/month</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">Oct 15</div>
+                        <div class="metric-label">Next Billing</div>
+                        <div class="metric-change">15 days</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>🔗 Integrations</h3>
+                <p>Third-party service connections</p>
+                <div class="sub-nav-item">
+                    <div class="sub-nav-icon">🔌</div>
+                    <div class="sub-nav-text">Connected Services</div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>👥 Team Management</h3>
+                <p>User accounts and permissions</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">12</div>
+                        <div class="metric-label">Team Members</div>
+                        <div class="metric-change">+2 ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">8</div>
+                        <div class="metric-label">Active Users</div>
+                        <div class="metric-change">4 online</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>🔧 Advanced Settings</h3>
+                <p>Technical and advanced configurations</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">45,230</div>
+                        <div class="metric-label">API Usage</div>
+                        <div class="metric-change">+5.2K ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">2.4 GB</div>
+                        <div class="metric-label">Storage</div>
+                        <div class="metric-change">of 10 GB</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>🔒 Security Settings</h3>
+                <p>Account security and access controls</p>
+                <div class="sub-nav-item">
+                    <div class="sub-nav-icon">🔐</div>
+                    <div class="sub-nav-text">Recent Security Events</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content hidden" id="properties-content">
+            <div class="section-title">Property Tools</div>
+            
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">🏢</div>
+                <div class="sub-nav-text">Properties Overview</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">📋</div>
+                <div class="sub-nav-text">Property Listings</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">📊</div>
+                <div class="sub-nav-text">Property Analytics</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">💰</div>
+                <div class="sub-nav-text">Property Financials</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">📄</div>
+                <div class="sub-nav-text">Property Documents</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">🔍</div>
+                <div class="sub-nav-text">Property Inspections</div>
+            </div>
+            
+            <div class="content-section">
+                <h3>🏢 Properties Overview</h3>
+                <p>Total property portfolio summary</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">156</div>
+                        <div class="metric-label">Total Properties</div>
+                        <div class="metric-change">+12 ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">1,245</div>
+                        <div class="metric-label">Total Units</div>
+                        <div class="metric-change">+45 ▲</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>📋 Property Listings</h3>
+                <p>Current available properties and vacancies</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">23</div>
+                        <div class="metric-label">Available Units</div>
+                        <div class="metric-change">-5 ▼</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">45</div>
+                        <div class="metric-label">Weekly Views</div>
+                        <div class="metric-change">+12 ▲</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>📊 Property Analytics</h3>
+                <p>Performance metrics and analytics</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">$1,823</div>
+                        <div class="metric-label">Avg Revenue</div>
+                        <div class="metric-change">+$145 ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">$127</div>
+                        <div class="metric-label">Avg Maintenance</div>
+                        <div class="metric-change">-$23 ▼</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>💰 Property Financials</h3>
+                <p>Financial performance and profitability</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">$284,500</div>
+                        <div class="metric-label">Monthly Revenue</div>
+                        <div class="metric-change">+$12.5K ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">$194,300</div>
+                        <div class="metric-label">Net Income</div>
+                        <div class="metric-change">+$8.2K ▲</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>📄 Property Documents</h3>
+                <p>Legal documents and property records</p>
+                <div class="sub-nav-item">
+                    <div class="sub-nav-icon">📁</div>
+                    <div class="sub-nav-text">Recent Document Uploads</div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>🔍 Property Inspections</h3>
+                <p>Inspection schedules and reports</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">18</div>
+                        <div class="metric-label">Scheduled</div>
+                        <div class="metric-change">+3 ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">4.5/5.0</div>
+                        <div class="metric-label">Avg Score</div>
+                        <div class="metric-change">+0.2 ▲</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content hidden" id="financial-content">
+            <div class="section-title">Financial Tools</div>
+            
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">💰</div>
+                <div class="sub-nav-text">Financial Overview</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">💳</div>
+                <div class="sub-nav-text">Payments Management</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">📊</div>
+                <div class="sub-nav-text">Expenses Tracking</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">📄</div>
+                <div class="sub-nav-text">Invoices Management</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">📈</div>
+                <div class="sub-nav-text">Budget Management</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">🏛️</div>
+                <div class="sub-nav-text">Taxes & Compliance</div>
+            </div>
+            
+            <div class="content-section">
+                <h3>💰 Financial Overview</h3>
+                <p>Complete financial dashboard summary</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">$284,500</div>
+                        <div class="metric-label">Monthly Revenue</div>
+                        <div class="metric-change">+$12.5K ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">$90,200</div>
+                        <div class="metric-label">Monthly Expenses</div>
+                        <div class="metric-change">+$3.2K ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">$194,300</div>
+                        <div class="metric-label">Net Profit</div>
+                        <div class="metric-change">+$9.3K ▲</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>💳 Payments Management</h3>
+                <p>Rent collection and payment tracking</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">$267,200</div>
+                        <div class="metric-label">Rent Collected</div>
+                        <div class="metric-change">+$11.2K ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">94.8%</div>
+                        <div class="metric-label">Collection Rate</div>
+                        <div class="metric-change">+2.3% ▲</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>📊 Expenses Tracking</h3>
+                <p>Operating costs and expense categories</p>
+                <div class="sub-nav-item">
+                    <div class="sub-nav-icon">📈</div>
+                    <div class="sub-nav-text">Expense Breakdown</div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>📄 Invoices Management</h3>
+                <p>Invoice creation and tracking</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">142</div>
+                        <div class="metric-label">Total Invoices</div>
+                        <div class="metric-change">+12 ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">118</div>
+                        <div class="metric-label">Paid Invoices</div>
+                        <div class="metric-change">+8 ▲</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>📈 Budget Management</h3>
+                <p>Budget planning and variance analysis</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">87.3%</div>
+                        <div class="metric-label">Budget Used</div>
+                        <div class="metric-change">+2.1% ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">$42,800</div>
+                        <div class="metric-label">Remaining</div>
+                        <div class="metric-change">-$12.2K ▼</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>🏛️ Taxes & Compliance</h3>
+                <p>Tax reporting and regulatory compliance</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">$28,450</div>
+                        <div class="metric-label">Tax Liability</div>
+                        <div class="metric-change">+$1.2K ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">$45,200</div>
+                        <div class="metric-label">Deductions</div>
+                        <div class="metric-change">+$3.1K ▲</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content hidden" id="tenants-content">
+            <div class="section-title">Tenant Tools</div>
+            
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">👥</div>
+                <div class="sub-nav-text">Tenants Overview</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">📝</div>
+                <div class="sub-nav-text">Tenant Applications</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">💬</div>
+                <div class="sub-nav-text">Tenant Communications</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">📋</div>
+                <div class="sub-nav-text">Tenant Directory</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">🔄</div>
+                <div class="sub-nav-text">Tenant Renewals</div>
+            </div>
+            <div class="sub-nav-item">
+                <div class="sub-nav-icon">⭐</div>
+                <div class="sub-nav-text">Tenant Feedback</div>
+            </div>
+            
+            <div class="content-section">
+                <h3>👥 Tenants Overview</h3>
+                <p>Complete tenant portfolio summary</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">142</div>
+                        <div class="metric-label">Total Tenants</div>
+                        <div class="metric-change">+5 ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">94.2%</div>
+                        <div class="metric-label">Occupancy</div>
+                        <div class="metric-change">+2.8% ▲</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>📝 Tenant Applications</h3>
+                <p>Rental applications and approval process</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">8</div>
+                        <div class="metric-label">Pending</div>
+                        <div class="metric-change">+2 ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">12</div>
+                        <div class="metric-label">Approved</div>
+                        <div class="metric-change">+3 ▲</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>💬 Tenant Communications</h3>
+                <p>Messaging and communication tracking</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">1,245</div>
+                        <div class="metric-label">Messages</div>
+                        <div class="metric-change">+125 ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">2.4 hrs</div>
+                        <div class="metric-label">Response Time</div>
+                        <div class="metric-change">-0.5 hrs ▼</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>📋 Tenant Directory</h3>
+                <p>Complete tenant listing and search</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">142</div>
+                        <div class="metric-label">Active Tenants</div>
+                        <div class="metric-change">+5 ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">48</div>
+                        <div class="metric-label">Long-term</div>
+                        <div class="metric-change">+3 ▲</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>🔄 Tenant Renewals</h3>
+                <p>Lease renewals and retention management</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">15</div>
+                        <div class="metric-label">Upcoming</div>
+                        <div class="metric-change">+2 ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">87.3%</div>
+                        <div class="metric-label">Renewal Rate</div>
+                        <div class="metric-change">+4.1% ▲</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>⭐ Tenant Feedback</h3>
+                <p>Reviews, ratings, and satisfaction surveys</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">89</div>
+                        <div class="metric-label">Total Reviews</div>
+                        <div class="metric-change">+12 ▲</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">4.2/5.0</div>
+                        <div class="metric-label">Avg Rating</div>
+                        <div class="metric-change">+0.2 ▲</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bottom-tabs">
+            <div class="tab active" onclick="showTab('dashboard')">Dashboard</div>
+            <div class="tab" onclick="showTab('analytics')">Analytics</div>
+            <div class="tab" onclick="showTab('maintenance')">Maintenance</div>
+            <div class="tab" onclick="showTab('settings')">Settings</div>
+            <div class="tab" onclick="showTab('properties')">Properties</div>
+            <div class="tab" onclick="showTab('financial')">Financial</div>
+            <div class="tab" onclick="showTab('tenants')">Tenants</div>
+        </div>
+    </div>
+    
+    <script>
+        function showTab(tabName) {
+            // Hide all content
+            document.querySelectorAll('.content').forEach(el => el.classList.add('hidden'));
+            
+            // Show selected content
+            document.getElementById(tabName + '-content').classList.remove('hidden');
+            
+            // Update tab styles
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update header
+            const titles = {
+                'dashboard': { title: 'Dashboard', subtitle: 'Property Management Overview' },
+                'analytics': { title: 'Analytics & Reports', subtitle: 'Deep insights and performance metrics' },
+                'maintenance': { title: 'Maintenance', subtitle: '23 open maintenance requests' },
+                'settings': { title: 'Settings', subtitle: 'App configuration and preferences' },
+                'properties': { title: 'Property Management', subtitle: 'Manage your 156 rental properties' },
+                'financial': { title: 'Financial Management', subtitle: 'Track revenue, expenses, and profits' },
+                'tenants': { title: 'Tenant Management', subtitle: 'Manage 142 active tenants' }
+            };
+            
+            document.getElementById('page-title').textContent = titles[tabName].title;
+            document.getElementById('page-subtitle').textContent = titles[tabName].subtitle;
+        }
+    </script>
+</body>
+</html>

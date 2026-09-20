@@ -1,131 +1,102 @@
 /**
  * Content Block Renderer
- * Renders different types of content blocks with appropriate components
+ * Renders different types of content blocks (metric, chart, list, card, text, image)
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { ContentBlock, ContentBlockType, MetricBlockData, ChartBlockData, ListBlockData, CardBlockData, TextBlockData, ImageBlockData } from '../../types';
+import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import {
+  ContentBlock,
+  ContentBlockType,
+  MetricBlockData,
+  ChartBlockData,
+  ListBlockData,
+  CardBlockData,
+} from '../../types/navigation';
 
-/**
- * ContentBlockRenderer Props
- */
+const { width } = Dimensions.get('window');
+
 interface ContentBlockRendererProps {
   block: ContentBlock;
   onPress?: (block: ContentBlock) => void;
 }
 
-/**
- * ContentBlockRenderer Component
- */
-export const ContentBlockRenderer: React.FC<ContentBlockRendererProps> = ({ block, onPress }) => {
-  /**
-   * Render metric block
-   */
+const ContentBlockRenderer: React.FC<ContentBlockRendererProps> = ({
+  block,
+  onPress,
+}) => {
   const renderMetricBlock = (data: MetricBlockData) => {
-    const formatValue = (value: number | string, format?: string): string => {
-      if (typeof value === 'string') return value;
-      
+    const formatValue = (value: number, format: string) => {
       switch (format) {
         case 'currency':
-          return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-          }).format(value);
+          return `${data.prefix || ''}$${value.toLocaleString()}`;
         case 'percentage':
-          return `${value.toFixed(1)}%`;
-        case 'number':
-          return new Intl.NumberFormat('en-US').format(value);
+          return `${value.toFixed(1)}${data.suffix || '%'}`;
         default:
-          return value.toString();
+          return `${value.toLocaleString()} ${data.unit || ''}`;
       }
     };
 
-    const changeColor = data.changeType === 'increase' ? '#10B981' : data.changeType === 'decrease' ? '#EF4444' : '#6B7280';
-    const changeIcon = data.changeType === 'increase' ? '↑' : data.changeType === 'decrease' ? '↓' : '→';
+    const changeColor = data.changeType === 'increase' ? '#10B981' : '#EF4444';
+    const changeIcon = data.changeType === 'increase' ? '↑' : '↓';
 
     return (
-      <View style={styles.metricContainer}>
-        <View style={styles.metricHeader}>
-          <Text style={styles.metricLabel}>{data.label}</Text>
-          {data.change !== undefined && (
-            <View style={styles.metricChange}>
-              <Text style={[styles.metricChangeText, { color: changeColor }]}>
-                {changeIcon} {Math.abs(data.change)}%
-              </Text>
-            </View>
-          )}
-        </View>
-        <Text style={styles.metricValue}>
-          {data.prefix || ''}{formatValue(data.value, data.format)}{data.suffix || ''}
-        </Text>
-        {data.unit && (
-          <Text style={styles.metricUnit}>{data.unit}</Text>
-        )}
-      </View>
-    );
-  };
-
-  /**
-   * Render chart block
-   */
-  const renderChartBlock = (data: ChartBlockData) => {
-    return (
-      <View style={styles.chartContainer}>
-        <Text style={styles.chartTitle}>{block.title}</Text>
-        <View style={styles.chartPlaceholder}>
-          <Text style={styles.chartPlaceholderText}>
-            {data.type.charAt(0).toUpperCase() + data.type.slice(1)} Chart
-          </Text>
-          <Text style={styles.chartPlaceholderSubtext}>
-            {data.data.length} data points
-          </Text>
-        </View>
-        {data.showLegend && (
-          <View style={styles.chartLegend}>
-            {data.data.slice(0, 4).map((point, index) => (
-              <View key={index} style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: data.colors?.[index] || '#3B82F6' }]} />
-                <Text style={styles.legendText}>{point.label}</Text>
-              </View>
-            ))}
+      <View style={styles.metricBlock}>
+        <Text style={styles.metricValue}>{formatValue(data.value, data.format)}</Text>
+        <Text style={styles.metricLabel}>{data.label}</Text>
+        {data.change !== undefined && (
+          <View style={styles.changeContainer}>
+            <Text style={[styles.changeText, { color: changeColor }]}>
+              {changeIcon} {Math.abs(data.change)}%
+            </Text>
           </View>
         )}
       </View>
     );
   };
 
-  /**
-   * Render list block
-   */
+  const renderChartBlock = (data: ChartBlockData) => {
+    const maxValue = Math.max(...data.data.map(d => d.value));
+    const barWidth = (width - 64) / data.data.length - 8;
+
+    return (
+      <View style={styles.chartBlock}>
+        <View style={styles.chartBars}>
+          {data.data.map((point, index) => {
+            const height = (point.value / maxValue) * 150;
+            return (
+              <View key={index} style={styles.chartBarContainer}>
+                <View
+                  style={[
+                    styles.chartBar,
+                    {
+                      height,
+                      backgroundColor: data.colors?.[index % data.colors.length] || '#3B82F6',
+                    },
+                  ]}
+                />
+                <Text style={styles.chartLabel}>{point.label}</Text>
+              </View>
+            );
+          })}
+        </View>
+      </View>
+    );
+  };
+
   const renderListBlock = (data: ListBlockData) => {
     return (
-      <View style={styles.listContainer}>
+      <View style={styles.listBlock}>
         {data.items.map((item, index) => (
-          <View key={item.id} style={[styles.listItem, index < data.items.length - 1 && styles.listItemBorder]}>
-            {data.showIcon && item.icon && (
-              <View style={styles.listItemIcon}>
-                <Text style={styles.listItemIconText}>{item.icon}</Text>
-              </View>
-            )}
-            <View style={styles.listItemContent}>
-              <Text style={styles.listItemTitle}>{item.title}</Text>
-              {item.description && (
-                <Text style={styles.listItemDescription}>{item.description}</Text>
-              )}
-              {item.metadata && Object.keys(item.metadata).length > 0 && (
-                <View style={styles.listItemMetadata}>
-                  {Object.entries(item.metadata).map(([key, value]) => (
-                    <Text key={key} style={styles.listItemMetadataText}>
-                      {typeof value === 'string' ? value : JSON.stringify(value)}
-                    </Text>
-                  ))}
-                </View>
-              )}
+          <View key={item.id} style={styles.listItem}>
+            {item.icon && <Text style={styles.listIcon}>{item.icon}</Text>}
+            <View style={styles.listContent}>
+              <Text style={styles.listTitle}>{item.title}</Text>
+              <Text style={styles.listDescription}>{item.description}</Text>
             </View>
             {item.badge && (
-              <View style={styles.listItemBadge}>
-                <Text style={styles.listItemBadgeText}>{item.badge}</Text>
+              <View style={styles.listBadge}>
+                <Text style={styles.listBadgeText}>{item.badge}</Text>
               </View>
             )}
           </View>
@@ -134,168 +105,53 @@ export const ContentBlockRenderer: React.FC<ContentBlockRendererProps> = ({ bloc
     );
   };
 
-  /**
-   * Render card block
-   */
   const renderCardBlock = (data: CardBlockData) => {
     return (
-      <View style={styles.cardContainer}>
-        <Text style={styles.cardTitle}>{data.title}</Text>
-        {data.subtitle && (
-          <Text style={styles.cardSubtitle}>{data.subtitle}</Text>
-        )}
-        {data.description && (
-          <Text style={styles.cardDescription}>{data.description}</Text>
-        )}
-        {data.metadata && data.metadata.length > 0 && (
-          <View style={styles.cardMetadata}>
-            {data.metadata.map((meta, index) => (
-              <View key={index} style={styles.cardMetadataItem}>
-                {meta.icon && <Text style={styles.cardMetadataIcon}>{meta.icon}</Text>}
-                <Text style={styles.cardMetadataLabel}>{meta.label}:</Text>
-                <Text style={styles.cardMetadataValue}>{meta.value}</Text>
-              </View>
-            ))}
-          </View>
-        )}
+      <View style={styles.cardBlock}>
+        <Text style={styles.cardText}>Card Content</Text>
       </View>
     );
   };
 
-  /**
-   * Render text block
-   */
-  const renderTextBlock = (data: TextBlockData) => {
-    return (
-      <View style={styles.textContainer}>
-        <Text style={[
-          styles.textContent,
-          data.size === 'small' && styles.textSmall,
-          data.size === 'large' && styles.textLarge,
-          data.weight === 'bold' && styles.textBold,
-          data.align === 'center' && styles.textCenter,
-          data.align === 'right' && styles.textRight,
-          { color: data.color || '#111827' }
-        ]}>
-          {data.content}
-        </Text>
-      </View>
-    );
-  };
-
-  /**
-   * Render image block
-   */
-  const renderImageBlock = (data: ImageBlockData) => {
-    return (
-      <View style={styles.imageContainer}>
-        <View style={[styles.imagePlaceholder, { aspectRatio: data.aspectRatio || 16/9 }]}>
-          <Text style={styles.imagePlaceholderText}>📷</Text>
-          <Text style={styles.imagePlaceholderSubtext}>{data.alt || 'Image'}</Text>
-        </View>
-        {data.caption && (
-          <Text style={styles.imageCaption}>{data.caption}</Text>
-        )}
-      </View>
-    );
-  };
-
-  /**
-   * Render content based on type
-   */
-  const renderContent = () => {
-    if (block.loading) {
-      return (
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading...</Text>
-        </View>
-      );
-    }
-
-    if (block.error) {
-      return (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{block.error}</Text>
-        </View>
-      );
-    }
-
-    const rawData = block.data;
-
+  const renderBlock = () => {
     switch (block.type) {
       case ContentBlockType.METRIC:
-        return renderMetricBlock((rawData || {
-          value: block.value ?? '—',
-          label: block.title || 'Metric',
-          change: typeof block.trend === 'number' ? block.trend : undefined,
-          changeType: block.positive === false ? 'decrease' : 'increase',
-        }) as MetricBlockData);
+        return renderMetricBlock(block.data as MetricBlockData);
       case ContentBlockType.CHART:
-        return renderChartBlock((rawData?.chartType
-          ? {
-              type: rawData.chartType,
-              data: (rawData.labels || []).map((label: string, index: number) => ({
-                label,
-                value: rawData.values?.[index] ?? 0,
-              })),
-              colors: rawData.colors || (rawData.color ? [rawData.color] : undefined),
-            }
-          : rawData) as ChartBlockData);
+        return renderChartBlock(block.data as ChartBlockData);
       case ContentBlockType.LIST:
-        return renderListBlock((Array.isArray(rawData)
-          ? { items: rawData, showIcon: true }
-          : rawData) as ListBlockData);
+        return renderListBlock(block.data as ListBlockData);
       case ContentBlockType.CARD:
-        return renderCardBlock(rawData as CardBlockData);
+        return renderCardBlock(block.data as CardBlockData);
       case ContentBlockType.TEXT:
-        return renderTextBlock(rawData as TextBlockData);
-      case ContentBlockType.IMAGE:
-        return renderImageBlock(rawData as ImageBlockData);
+        return <Text style={styles.textBlock}>{block.data}</Text>;
       default:
-        return (
-          <View style={styles.unknownContainer}>
-            <Text style={styles.unknownText}>Unknown content type: {block.type}</Text>
-          </View>
-        );
+        return <Text style={styles.textBlock}>Unknown block type</Text>;
     }
   };
 
   return (
-    <TouchableOpacity
-      style={[styles.container, block.styles?.container]}
-      onPress={() => onPress?.(block)}
-      disabled={!onPress}
-      activeOpacity={0.85}
-    >
-      {block.title && block.type !== ContentBlockType.METRIC && block.type !== ContentBlockType.CHART && (
-        <Text style={[styles.blockTitle, block.styles?.title]}>{block.title}</Text>
-      )}
-      {block.description && block.type !== ContentBlockType.METRIC && (
-        <Text style={[styles.blockDescription, block.styles?.description]}>{block.description}</Text>
-      )}
-      {renderContent()}
-    </TouchableOpacity>
+    <View style={styles.container}>
+      {block.title && <Text style={styles.blockTitle}>{block.title}</Text>}
+      {block.description && <Text style={styles.blockDescription}>{block.description}</Text>}
+      {renderBlock()}
+    </View>
   );
 };
 
-/**
- * Default styles
- */
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    marginHorizontal: 16,
+    marginVertical: 8,
     padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   blockTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '600',
     color: '#111827',
     marginBottom: 8,
   },
@@ -303,62 +159,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6B7280',
     marginBottom: 12,
-    lineHeight: 20,
   },
-  loadingContainer: {
-    padding: 20,
-    justifyContent: 'center',
+  metricBlock: {
     alignItems: 'center',
-  },
-  loadingText: {
-    color: '#6B7280',
-    fontSize: 14,
-  },
-  errorContainer: {
-    padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FEF2F2',
-    borderRadius: 8,
-  },
-  errorText: {
-    color: '#EF4444',
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  unknownContainer: {
-    padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  unknownText: {
-    color: '#6B7280',
-    fontSize: 14,
-  },
-  // Metric styles
-  metricContainer: {
-    padding: 16,
-  },
-  metricHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  metricLabel: {
-    fontSize: 14,
-    color: '#6B7280',
-    fontWeight: '500',
-  },
-  metricChange: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    backgroundColor: '#F3F4F6',
-  },
-  metricChangeText: {
-    fontSize: 12,
-    fontWeight: '600',
+    paddingVertical: 16,
   },
   metricValue: {
     fontSize: 32,
@@ -366,216 +170,92 @@ const styles = StyleSheet.create({
     color: '#111827',
     marginBottom: 4,
   },
-  metricUnit: {
+  metricLabel: {
     fontSize: 14,
     color: '#6B7280',
+    marginBottom: 8,
   },
-  // Chart styles
-  chartContainer: {
-    padding: 16,
-  },
-  chartTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 12,
-  },
-  chartPlaceholder: {
-    height: 200,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  chartPlaceholderText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#6B7280',
-    marginBottom: 4,
-  },
-  chartPlaceholderSubtext: {
-    fontSize: 14,
-    color: '#9CA3AF',
-  },
-  chartLegend: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  legendItem: {
+  changeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  legendColor: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: 6,
+  changeText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
-  legendText: {
-    fontSize: 12,
+  chartBlock: {
+    paddingVertical: 16,
+  },
+  chartBars: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-end',
+    height: 180,
+  },
+  chartBarContainer: {
+    alignItems: 'center',
+    width: 40,
+  },
+  chartBar: {
+    width: 24,
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  chartLabel: {
+    fontSize: 10,
     color: '#6B7280',
+    textAlign: 'center',
   },
-  // List styles
-  listContainer: {
-    padding: 8,
+  listBlock: {
+    paddingVertical: 8,
   },
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
-    paddingHorizontal: 8,
-  },
-  listItemBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#F3F4F6',
   },
-  listItemIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#EFF6FF',
-    justifyContent: 'center',
-    alignItems: 'center',
+  listIcon: {
+    fontSize: 20,
     marginRight: 12,
   },
-  listItemIconText: {
-    fontSize: 18,
-  },
-  listItemContent: {
+  listContent: {
     flex: 1,
   },
-  listItemTitle: {
+  listTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: '#111827',
-    marginBottom: 4,
+    marginBottom: 2,
   },
-  listItemDescription: {
+  listDescription: {
     fontSize: 14,
     color: '#6B7280',
-    marginBottom: 4,
   },
-  listItemMetadata: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  listItemMetadataText: {
-    fontSize: 12,
-    color: '#9CA3AF',
-  },
-  listItemBadge: {
-    backgroundColor: '#3B82F6',
-    borderRadius: 12,
+  listBadge: {
+    backgroundColor: '#F3F4F6',
     paddingHorizontal: 8,
     paddingVertical: 4,
-    minWidth: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderRadius: 12,
   },
-  listItemBadgeText: {
-    color: '#FFFFFF',
+  listBadgeText: {
     fontSize: 12,
     fontWeight: '600',
-  },
-  // Card styles
-  cardContainer: {
-    padding: 16,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 4,
-  },
-  cardSubtitle: {
-    fontSize: 14,
     color: '#6B7280',
-    marginBottom: 8,
   },
-  cardDescription: {
+  cardBlock: {
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  cardText: {
+    fontSize: 16,
+    color: '#6B7280',
+  },
+  textBlock: {
     fontSize: 14,
     color: '#374151',
     lineHeight: 20,
-    marginBottom: 12,
-  },
-  cardMetadata: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 8,
-    padding: 12,
-  },
-  cardMetadataItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  cardMetadataIcon: {
-    marginRight: 8,
-    fontSize: 16,
-  },
-  cardMetadataLabel: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginRight: 4,
-  },
-  cardMetadataValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  // Text styles
-  textContainer: {
-    padding: 16,
-  },
-  textContent: {
-    fontSize: 16,
-    color: '#111827',
-    lineHeight: 24,
-  },
-  textSmall: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  textLarge: {
-    fontSize: 20,
-    lineHeight: 28,
-  },
-  textBold: {
-    fontWeight: '700',
-  },
-  textCenter: {
-    textAlign: 'center',
-  },
-  textRight: {
-    textAlign: 'right',
-  },
-  // Image styles
-  imageContainer: {
-    padding: 16,
-  },
-  imagePlaceholder: {
-    backgroundColor: '#F3F4F6',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  imagePlaceholderText: {
-    fontSize: 32,
-    marginBottom: 8,
-  },
-  imagePlaceholderSubtext: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  imageCaption: {
-    fontSize: 14,
-    color: '#6B7280',
-    textAlign: 'center',
-    fontStyle: 'italic',
   },
 });
 

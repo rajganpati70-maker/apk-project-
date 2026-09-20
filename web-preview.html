@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnyRenting App Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .app-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 20px;
+        }
+        
+        .metric-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+        
+        .metric-change {
+            font-size: 11px;
+            color: #10b981;
+            font-weight: 600;
+        }
+        
+        .navigation-section {
+            padding: 20px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 15px;
+        }
+        
+        .nav-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .nav-content {
+            flex: 1;
+        }
+        
+        .nav-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 3px;
+        }
+        
+        .nav-description {
+            font-size: 13px;
+            color: #64748b;
+        }
+        
+        .nav-badge {
+            background: #ef4444;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 10px;
+            margin-left: 10px;
+        }
+        
+        .content-section {
+            padding: 0 20px 20px;
+        }
+        
+        .chart-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 15px;
+        }
+        
+        .chart-placeholder {
+            height: 150px;
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4f46e5;
+            font-weight: 600;
+        }
+        
+        .revenue-list {
+            list-style: none;
+        }
+        
+        .revenue-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .revenue-item:last-child {
+            border-bottom: none;
+        }
+        
+        .revenue-label {
+            color: #64748b;
+            font-size: 14px;
+        }
+        
+        .revenue-value {
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>AnyRenting Dashboard</h1>
+            <p>Property Management Overview</p>
+        </div>
+        
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">156</div>
+                <div class="metric-label">Total Properties</div>
+                <div class="metric-change">+12 ▲</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">94.2%</div>
+                <div class="metric-label">Occupancy Rate</div>
+                <div class="metric-change">+2.8% ▲</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">$284.5K</div>
+                <div class="metric-label">Monthly Revenue</div>
+                <div class="metric-change">+8.5% ▲</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">142</div>
+                <div class="metric-label">Active Tenants</div>
+                <div class="metric-change">+5 ▲</div>
+            </div>
+        </div>
+        
+        <div class="navigation-section">
+            <div class="section-title">Navigation</div>
+            
+            <div class="nav-item">
+                <div class="nav-icon">🏢</div>
+                <div class="nav-content">
+                    <div class="nav-title">Property Management</div>
+                    <div class="nav-description">Manage your 156 rental properties</div>
+                </div>
+                <div class="nav-badge">23</div>
+            </div>
+            
+            <div class="nav-item">
+                <div class="nav-icon">💰</div>
+                <div class="nav-content">
+                    <div class="nav-title">Financial Management</div>
+                    <div class="nav-description">Track revenue, expenses, and profits</div>
+                </div>
+                <div class="nav-badge">5</div>
+            </div>
+            
+            <div class="nav-item">
+                <div class="nav-icon">👥</div>
+                <div class="nav-content">
+                    <div class="nav-title">Tenant Management</div>
+                    <div class="nav-description">Manage 142 active tenants</div>
+                </div>
+                <div class="nav-badge">8</div>
+            </div>
+            
+            <div class="nav-item">
+                <div class="nav-icon">📊</div>
+                <div class="nav-content">
+                    <div class="nav-title">Analytics & Reports</div>
+                    <div class="nav-description">Deep insights and performance metrics</div>
+                </div>
+            </div>
+            
+            <div class="nav-item">
+                <div class="nav-icon">🔧</div>
+                <div class="nav-content">
+                    <div class="nav-title">Maintenance</div>
+                    <div class="nav-description">23 open maintenance requests</div>
+                </div>
+                <div class="nav-badge">23</div>
+            </div>
+            
+            <div class="nav-item">
+                <div class="nav-icon">⚙️</div>
+                <div class="nav-content">
+                    <div class="nav-title">Settings</div>
+                    <div class="nav-description">App configuration and preferences</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <div class="section-title">Revenue Analytics</div>
+            
+            <div class="chart-card">
+                <div class="chart-title">Revenue Trend (6 Months)</div>
+                <div class="chart-placeholder">
+                    📈 Revenue Chart
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <div class="chart-title">Monthly Breakdown</div>
+                <ul class="revenue-list">
+                    <li class="revenue-item">
+                        <span class="revenue-label">January</span>
+                        <span class="revenue-value">$245,000</span>
+                    </li>
+                    <li class="revenue-item">
+                        <span class="revenue-label">February</span>
+                        <span class="revenue-value">$260,000</span>
+                    </li>
+                    <li class="revenue-item">
+                        <span class="revenue-label">March</span>
+                        <span class="revenue-value">$265,000</span>
+                    </li>
+                    <li class="revenue-item">
+                        <span class="revenue-label">April</span>
+                        <span class="revenue-value">$270,000</span>
+                    </li>
+                    <li class="revenue-item">
+                        <span class="revenue-label">May</span>
+                        <span class="revenue-value">$275,000</span>
+                    </li>
+                    <li class="revenue-item">
+                        <span class="revenue-label">June</span>
+                        <span class="revenue-value">$284,500</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
